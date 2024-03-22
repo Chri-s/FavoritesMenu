@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FavoritesMenu", "FavoritesMenu\FavoritesMenu.csproj", "{F3EA4B73-9CB2-4DC5-8D4E-A57CAB7BDFCC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F3EA4B73-9CB2-4DC5-8D4E-A57CAB7BDFCC}.Debug|x64.ActiveCfg = Debug|x64
+		{F3EA4B73-9CB2-4DC5-8D4E-A57CAB7BDFCC}.Debug|x64.Build.0 = Debug|x64
+		{F3EA4B73-9CB2-4DC5-8D4E-A57CAB7BDFCC}.Release|x64.ActiveCfg = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {20740C8D-445C-455B-8651-291185F6FC2A}
+	EndGlobalSection
+EndGlobal
