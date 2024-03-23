@@ -10,15 +10,16 @@
 		<PlatformTarget>x64</PlatformTarget>
 		<Platforms>x64</Platforms>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<ApplicationIcon>Notify.ico</ApplicationIcon>
+		<ApplicationIcon>Resources\Notify.ico</ApplicationIcon>
+		<AssemblyName>FavoritesMenu</AssemblyName>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-	  <DebugType>embedded</DebugType>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-	  <DebugType>embedded</DebugType>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -36,12 +37,11 @@
 		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.49-beta">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
 		<PackageReference Include="WPF-UI" Version="3.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Resource Include="Notify.ico" />
+		<Resource Include="Resources\Notify.ico" />
 	</ItemGroup>
 
 </Project>

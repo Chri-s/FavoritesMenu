@@ -6,8 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
+using FavoritesMenu.Views;
 
-namespace FavoritesMenu;
+namespace FavoritesMenu.ViewModels;
 
 internal partial class SearchItemViewModel : ObservableObject
 {

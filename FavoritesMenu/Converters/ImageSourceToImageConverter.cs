@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Windows.Win32;
 
-namespace FavoritesMenu;
+namespace FavoritesMenu.Converters;
 
 [ValueConversion(typeof(ImageSource), typeof(Image))]
 internal class ImageSourceToImageConverter : IValueConverter

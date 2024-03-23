@@ -8,9 +8,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FavoritesMenu.Views;
 using Microsoft.Win32;
 
-namespace FavoritesMenu;
+namespace FavoritesMenu.ViewModels;
 
 internal partial class SettingsViewModel : ObservableObject
 {

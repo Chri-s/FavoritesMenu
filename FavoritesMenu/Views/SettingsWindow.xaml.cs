@@ -11,21 +11,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Wpf.Ui.Appearance;
 
-namespace FavoritesMenu;
-/// <summary>
-/// Interaction logic for SearchWindow.xaml
-/// </summary>
-partial class SearchWindow
+namespace FavoritesMenu.Views;
+
+internal partial class SettingsWindow
 {
-    public SearchWindow()
+    public SettingsWindow()
     {
         InitializeComponent();
-    }
-
-    public void FocusSearchTextBox()
-    {
-        this.searchTextBox.Focus();
-        this.searchTextBox.SelectionStart = this.searchTextBox.Text.Length;
     }
 }

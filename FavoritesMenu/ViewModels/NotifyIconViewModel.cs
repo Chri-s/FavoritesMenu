@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FavoritesMenu.Views;
 
 
-namespace FavoritesMenu;
+namespace FavoritesMenu.ViewModels;
 
 internal partial class NotifyIconViewModel : ObservableObject
 {

@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using FavoritesMenu.ViewModels;
 
 namespace FavoritesMenu;
 /// <summary>
@@ -24,7 +25,7 @@ public partial class App : Application
     {
         App.CurrentApp = this;
 
-        this.taskbarIcon = (H.NotifyIcon.TaskbarIcon)FindResource("NotifyIcon");
+        this.taskbarIcon = (H.NotifyIcon.TaskbarIcon)FindResource("TaskbarIcon");
 
         ((NotifyIconViewModel)this.taskbarIcon.DataContext).RefreshItems();
 

@@ -12,12 +12,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using FavoritesMenu.ViewModels;
 using Wpf.Ui.Appearance;
 
-namespace FavoritesMenu;
-/// <summary>
-/// Interaction logic for AboutWindow.xaml
-/// </summary>
+namespace FavoritesMenu.Views;
+
 internal partial class AboutWindow
 {
     public AboutWindow()
