@@ -17,8 +17,38 @@ internal partial class NotifyIconViewModel : ObservableObject
 {
     private SettingsWindow? settingsWindow;
 
+    private List<object> rootItems = null!;
+
+    private SearchItemViewModel searchVm = new SearchItemViewModel();
+
+    public NotifyIconViewModel()
+    {
+        this.searchVm.PropertyChanged += SearchVm_PropertyChanged;
+    }
+
+    private void SearchVm_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(searchVm.SearchString))
+            return;
+
+        if (string.IsNullOrEmpty(searchVm.SearchString))
+        {
+            this.Items = rootItems;
+        }
+        else
+        {
+            List<object> items = this.rootItems.OfType<ItemData>()
+                                              .Where(i => i.DisplayName.Contains(searchVm.SearchString, StringComparison.OrdinalIgnoreCase))
+                                              .Cast<object>()
+                                              .Append(this.searchVm)
+                                              .ToList();
+
+            this.Items = items;
+        }
+    }
+
     [ObservableProperty]
-    private List<ItemData> items = new();
+    private List<object> items = new();
 
     [RelayCommand]
     public void RefreshItems()
@@ -27,7 +57,12 @@ internal partial class NotifyIconViewModel : ObservableObject
 
         try
         {
-            this.Items = AddDirectory(path);
+            List<ItemData> allItems = new();
+            List<ItemData> itemData = AddDirectory(path, string.Empty, allItems);
+            this.rootItems = itemData.Cast<object>().Append(searchVm).ToList();
+            this.Items = rootItems;
+
+            this.searchVm.Items = allItems;
         }
         catch
         {
@@ -35,11 +70,11 @@ internal partial class NotifyIconViewModel : ObservableObject
         }
     }
 
-    private List<ItemData> AddDirectory(string path)
+    private List<ItemData> AddDirectory(string path, string folderPath, List<ItemData> allItems)
     {
         var menuItems = (from d in new DirectoryInfo(path).GetFileSystemInfos("*", new EnumerationOptions() { IgnoreInaccessible = true })
                          where !d.Attributes.HasFlag(FileAttributes.Hidden)
-                         let i = new ItemData(Shell.GetDisplayName(d.FullName), d.FullName, d is FileInfo, Shell.GetFileIcon(d.FullName))
+                         let i = new ItemData(Shell.GetDisplayName(d.FullName), d.FullName, folderPath, d is FileInfo, Shell.GetFileIcon(d.FullName), Shell.GetLargeFileIcon(d.FullName))
                          select i).ToList();
 
         menuItems.Sort((x, y) =>
@@ -51,10 +86,20 @@ internal partial class NotifyIconViewModel : ObservableObject
             return string.Compare(x.DisplayName, y.DisplayName, true);
         });
 
+        string folderPathWithSeparator = folderPath + ((folderPath.Length > 0) ? " > " : string.Empty);
+
         foreach (var directoryItem in menuItems)
         {
             if (!directoryItem.IsFile)
-                directoryItem.SubItems.AddRange(AddDirectory(directoryItem.FullPath));
+            {
+                string displayName = Shell.GetDisplayName(directoryItem.FullPath);
+                string itemFolderPath = folderPathWithSeparator + displayName;
+                directoryItem.SubItems.AddRange(AddDirectory(directoryItem.FullPath, itemFolderPath, allItems));
+            }
+            else
+            {
+                allItems.Add(directoryItem);
+            }
         }
 
         return menuItems;

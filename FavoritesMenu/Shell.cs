@@ -34,6 +34,7 @@ internal class Shell
     private const uint CMIC_MASK_CONTROL_DOWN = 0x40000000;
 
     private static Dictionary<int, ImageSource> imageList = new Dictionary<int, ImageSource>();
+    private static Dictionary<int, ImageSource> largeImageList = new Dictionary<int, ImageSource>();
 
     public static unsafe ImageSource? GetFileIcon(string path)
     {
@@ -53,6 +54,28 @@ internal class Shell
         PInvoke.DestroyIcon(shinfo.hIcon);
 
         imageList.Add(shinfo.iIcon, imageSource);
+
+        return imageSource;
+    }
+
+    public static unsafe ImageSource? GetLargeFileIcon(string path)
+    {
+        SHFILEINFOW shinfo = new SHFILEINFOW();
+
+        nuint hImgList = PInvoke.SHGetFileInfo(path, Windows.Win32.Storage.FileSystem.FILE_FLAGS_AND_ATTRIBUTES.SECURITY_ANONYMOUS, &shinfo, (uint)Marshal.SizeOf(shinfo), SHGFI_FLAGS.SHGFI_ICON | SHGFI_FLAGS.SHGFI_LARGEICON | SHGFI_FLAGS.SHGFI_SYSICONINDEX);
+        if (hImgList == 0)
+            return null;
+
+        if (largeImageList.TryGetValue(shinfo.iIcon, out ImageSource? imageSource))
+            return imageSource;
+
+        HICON icon = PInvoke.ImageList_GetIcon(new Windows.Win32.UI.Controls.HIMAGELIST((nint)hImgList), shinfo.iIcon, Windows.Win32.UI.Controls.IMAGE_LIST_DRAW_STYLE.ILD_NORMAL);
+
+        imageSource = Imaging.CreateBitmapSourceFromHIcon(icon, new Int32Rect(0, 0, 32, 32), BitmapSizeOptions.FromEmptyOptions());
+        imageSource.Freeze();
+        PInvoke.DestroyIcon(shinfo.hIcon);
+
+        largeImageList.Add(shinfo.iIcon, imageSource);
 
         return imageSource;
     }

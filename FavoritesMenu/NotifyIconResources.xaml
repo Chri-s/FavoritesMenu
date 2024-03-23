@@ -9,21 +9,32 @@
 
     <local:EscapeAccessKeyConverter x:Key="EscapeConverter" />
 
-    <ContextMenu x:Key="SysTrayMenu" x:Shared="false" ItemsSource="{Binding Items}">
-        <ContextMenu.ItemContainerStyle>
-            <Style TargetType="{x:Type MenuItem}">
-                <Setter Property="Header" Value="{Binding DisplayName,Converter={StaticResource EscapeConverter}}" />
-                <Setter Property="ItemsSource" Value="{Binding Path=SubItems}" />
-                <Setter Property="Icon" Value="{Binding ImageSource, Converter={StaticResource ImageConverter}}" />
+    <Style TargetType="{x:Type MenuItem}" x:Key="DefaultMenuItemStyle">
+        <Setter Property="Header" Value="{Binding DisplayName,Converter={StaticResource EscapeConverter}}" />
+        <Setter Property="ItemsSource" Value="{Binding Path=SubItems}" />
+        <Setter Property="Icon" Value="{Binding ImageSource, Converter={StaticResource ImageConverter}}" />
 
-                <Setter Property="Command" Value="{Binding DataContext.OpenItemCommand,RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                <Setter Property="CommandParameter" Value="{Binding}" />
+        <Setter Property="Command" Value="{Binding DataContext.OpenItemCommand,RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+        <Setter Property="CommandParameter" Value="{Binding}" />
 
-                <Setter Property="localBehaviors:RightClickBehaviors.Command" Value="{Binding DataContext.OpenContextMenuCommand,RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-                <Setter Property="localBehaviors:RightClickBehaviors.CommandParameter" Value="{Binding}" />
-            </Style>
-        </ContextMenu.ItemContainerStyle>
-    </ContextMenu>
+        <Setter Property="localBehaviors:RightClickBehaviors.Command" Value="{Binding DataContext.OpenContextMenuCommand,RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+        <Setter Property="localBehaviors:RightClickBehaviors.CommandParameter" Value="{Binding}" />
+    </Style>
+
+    <Style TargetType="{x:Type MenuItem}" x:Key="SearchMenuItemStyle">
+        <Setter Property="HeaderTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBox Text="{Binding SearchString, UpdateSourceTrigger=PropertyChanged}" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <local:MenuItemStyleSelector x:Key="MenuItemStyleSelector" DefaultMenuItemStyle="{StaticResource DefaultMenuItemStyle}" SearchMenuItemStyle="{StaticResource SearchMenuItemStyle}" />
+
+    <ContextMenu x:Key="SysTrayMenu" x:Shared="false" ItemsSource="{Binding Items}" ItemContainerStyleSelector="{StaticResource MenuItemStyleSelector}" />
+
 
     <!--  This is copied from the Wpf.UI TextBlock style.
           If a text contains an underscore ("_"), the TextBlock is replaced with AccessText.
