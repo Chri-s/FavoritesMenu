@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using FavoritesMenu.ViewModels;
+using FavoritesMenu.Views;
 
 namespace FavoritesMenu;
 /// <summary>
@@ -30,6 +31,8 @@ public partial class App : Application
         ((NotifyIconViewModel)this.taskbarIcon.DataContext).RefreshItems();
 
         this.taskbarIcon.ForceCreate();
+
+        new MainWindow() { DataContext = new MainWindowViewModel() }.Show();
     }
 
     //private List<ItemData> AddDirectory(string path)

@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FavoritesMenu.Views;
 using Microsoft.Win32;
 
 namespace FavoritesMenu.ViewModels;
@@ -20,32 +16,95 @@ internal partial class SettingsViewModel : ObservableObject
 
     private const string SettingsKeyName = @"Software\chri-s\FavoritesMenu";
     private const string MenuPathValueName = "MenuPath";
+    private const string SearchHotkeyValueName = "SearchHotkey";
+    private const string MenuHotkeyValueName = "MenuHotkey";
 
     private readonly string ValueForStartup = $"\"{Environment.ProcessPath}\"";
 
-    public SettingsViewModel(SettingsWindow window)
-    {
-        this.window = window;
+    private bool isInitializing = true;
 
+    public SettingsViewModel()
+    {
         using var runKey = Registry.CurrentUser.CreateSubKey(RunKeyName, false);
 
         object? value = runKey.GetValue(RunValueName);
 
         this.StartWithWindows = (value is string s && string.Equals(s, ValueForStartup, StringComparison.OrdinalIgnoreCase));
-        this.ToolbarPath = GetToolbarPath();
-    }
 
-    private readonly SettingsWindow window;
+        using var settingsKey = GetSettingsRegistryKey(false);
+        this.ToolbarPath = GetToolbarPath(settingsKey);
+        this.SearchHotKey = GetHotkey(settingsKey, SearchHotkeyValueName);
+        this.MenuHotKey = GetHotkey(settingsKey, MenuHotkeyValueName);
+
+        this.isInitializing = false;
+    }
 
     [ObservableProperty]
     private bool startWithWindows;
 
-    [ObservableProperty]
-    private bool toolbarPathIsInvalid;
+    partial void OnStartWithWindowsChanged(bool value)
+    {
+        if (this.isInitializing)
+            return;
+
+        try
+        {
+            using (var runKey = Registry.CurrentUser.CreateSubKey(RunKeyName))
+            {
+                if (this.StartWithWindows)
+                    runKey.SetValue(RunValueName, ValueForStartup);
+                else
+                    runKey.DeleteValue(RunValueName, false);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("An error occurred while changing the \"Start with Windows\"-option: " + ex.Message, "Error while saving");
+        }
+    }
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
     private string toolbarPath = string.Empty;
+
+    partial void OnToolbarPathChanged(string value)
+    {
+        if (this.isInitializing)
+            return;
+
+        try
+        {
+            using (var softwareKey = Registry.CurrentUser.CreateSubKey(SettingsKeyName))
+                softwareKey.SetValue(MenuPathValueName, this.ToolbarPath);
+
+            // TODO: Refresh
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("An error occured while saving the toolbar path: " + ex.Message, "Settings - Favorites Menu");
+        }
+    }
+
+    [ObservableProperty]
+    private HotkeyConverter? searchHotKey;
+
+    partial void OnSearchHotKeyChanged(HotkeyConverter? oldValue, HotkeyConverter? newValue)
+    {
+        if (this.isInitializing)
+            return;
+
+        SetHotkey(SearchHotkeyValueName, newValue);
+    }
+
+    [ObservableProperty]
+    private HotkeyConverter? menuHotKey;
+
+    partial void OnMenuHotKeyChanged(HotkeyConverter? oldValue, HotkeyConverter? newValue)
+    {
+        if (this.isInitializing)
+            return;
+
+        SetHotkey(MenuHotkeyValueName, newValue);
+    }
 
     [RelayCommand]
     private void BrowseFolder()
@@ -58,64 +117,40 @@ internal partial class SettingsViewModel : ObservableObject
         if (openFolderDialog.ShowDialog() ?? false)
         {
             this.ToolbarPath = openFolderDialog.FolderName;
-            this.ToolbarPathIsInvalid = false;
-        }
-    }
-
-    [RelayCommand]
-    private void Cancel()
-    {
-        this.window.DialogResult = false;
-    }
-
-    private bool CanSave()
-    {
-        bool isValid;
-        try
-        {
-            isValid = Path.Exists(this.ToolbarPath);
-        }
-        catch
-        {
-            isValid = false;
-        }
-
-        this.ToolbarPathIsInvalid = !isValid;
-
-        return isValid;
-    }
-
-    [RelayCommand(CanExecute = nameof(CanSave))]
-    private void Save()
-    {
-        this.window.DialogResult = true;
-
-        try
-        {
-            using (var runKey = Registry.CurrentUser.CreateSubKey(RunKeyName))
-            {
-                if (this.StartWithWindows)
-                    runKey.SetValue(RunValueName, ValueForStartup);
-                else
-                    runKey.DeleteValue(RunValueName, false);
-            }
-
-            using (var softwareKey = Registry.CurrentUser.CreateSubKey(SettingsKeyName))
-                softwareKey.SetValue(MenuPathValueName, this.ToolbarPath);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("An error occured while saving the settings: " + ex.Message, "Settings - Favorites Menu");
         }
     }
 
     public static string GetToolbarPath()
     {
-        using (var softwareKey = Registry.CurrentUser.CreateSubKey(SettingsKeyName, false))
-        {
-            object? value = softwareKey.GetValue(MenuPathValueName);
+        using var settingsKey = GetSettingsRegistryKey(false);
+        return GetToolbarPath(settingsKey);
+    }
 
-            return value as string ?? string.Empty;
-        }
+    private static RegistryKey GetSettingsRegistryKey(bool writable) => Registry.CurrentUser.CreateSubKey(SettingsKeyName, writable);
+
+    private static string GetToolbarPath(RegistryKey settingsKey)
+    {
+        if (settingsKey.GetValue(MenuPathValueName) is string value)
+            return value;
+
+        return string.Empty;
+    }
+
+    private static HotkeyConverter? GetHotkey(RegistryKey settingsKey, string valueName)
+    {
+        if (settingsKey.GetValue(valueName) is int value)
+            return new HotkeyConverter((uint)value);
+
+        return null;
+    }
+
+    private static void SetHotkey(string valueName, HotkeyConverter? hotkey)
+    {
+        using var settingsKey = GetSettingsRegistryKey(true);
+
+        if (hotkey == null)
+            settingsKey.DeleteValue(valueName, false);
+        else
+            settingsKey.SetValue(valueName, hotkey.GetSettingsFormat(), RegistryValueKind.DWord);
     }
 }

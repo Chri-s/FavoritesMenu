@@ -138,8 +138,7 @@ internal partial class NotifyIconViewModel : ObservableObject
         }
 
         this.settingsWindow = new();
-        SettingsViewModel vm = new SettingsViewModel(this.settingsWindow);
-        vm.ToolbarPathIsInvalid = toolbarPathIsInvalid;
+        SettingsViewModel vm = new SettingsViewModel();
         settingsWindow.DataContext = vm;
 
         settingsWindow.Closed += delegate { this.settingsWindow = null; };

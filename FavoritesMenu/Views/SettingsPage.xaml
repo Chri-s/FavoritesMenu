@@ -1,0 +1,93 @@
+﻿<Page x:Class="FavoritesMenu.Views.SettingsPage" x:ClassModifier="internal"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:controls="clr-namespace:FavoritesMenu.Controls"
+      xmlns:vm="clr-namespace:FavoritesMenu.ViewModels"
+      xmlns:local="clr-namespace:FavoritesMenu.Views"
+      mc:Ignorable="d" 
+      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Settings">
+    <Page.DataContext>
+        <vm:SettingsViewModel />
+    </Page.DataContext>
+
+    <StackPanel Margin="0,0,0,24">
+        <ui:TextBlock
+            Margin="0,0,0,8"
+            FontTypography="BodyStrong"
+            Text="Toolbar data" />
+
+        <ui:CardControl Margin="0,0,0,12" Icon="{ui:SymbolIcon Folder16}">
+            <ui:CardControl.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ui:TextBlock
+                    Grid.Row="0"
+                    FontTypography="Body"
+                    Text="Folder" />
+                    <ui:TextBlock
+                    Grid.Row="1"
+                    Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}"
+                    Text="Enter the path of the folder containing the items to show" />
+                </Grid>
+            </ui:CardControl.Header>
+
+            <ui:Button Command="{Binding BrowseFolderCommand}">Browse ...</ui:Button>
+        </ui:CardControl>
+
+        <ui:TextBlock
+        Margin="0,0,0,8"
+        FontTypography="BodyStrong"
+        Text="Appearance &amp; behavior" />
+        <ui:CardControl Margin="0,0,0,12" Icon="{ui:SymbolIcon Color24}">
+            <ui:CardControl.Header>
+                <StackPanel>
+                    <ui:TextBlock>App theme</ui:TextBlock>
+                    <ui:TextBlock Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}">Select which app theme to display</ui:TextBlock>
+                </StackPanel>
+            </ui:CardControl.Header>
+
+            <!-- SelectedIndex="{Binding ViewModel.CurrentApplicationTheme, Converter={StaticResource ThemeToIndexConverter}, Mode=TwoWay}" -->
+            <ComboBox MinWidth="200">
+                <ComboBoxItem Content="Light" />
+                <ComboBoxItem Content="Dark" />
+                <ComboBoxItem Content="High Contrast" />
+            </ComboBox>
+        </ui:CardControl>
+
+        <ui:CardControl Margin="0,0,0,12" Icon="{ui:SymbolIcon PlayCircle16}">
+            <ui:CardControl.Header>
+                <ui:TextBlock>Start with windows</ui:TextBlock>
+            </ui:CardControl.Header>
+            <ui:ToggleSwitch IsChecked="{Binding StartWithWindows}" />
+        </ui:CardControl>
+
+        <ui:CardControl Margin="0,0,0,12" Icon="{ui:SymbolIcon Empty}">
+            <ui:CardControl.Header>
+                <StackPanel>
+                    <ui:TextBlock>Search hotkey</ui:TextBlock>
+                    <ui:TextBlock Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}">Define a key combination which opens the search</ui:TextBlock>
+                </StackPanel>
+            </ui:CardControl.Header>
+            <controls:HotkeyEditor Hotkey="{Binding SearchHotKey}" />
+        </ui:CardControl>
+
+        <ui:CardControl Margin="0,0,0,12" Icon="{ui:SymbolIcon Empty}">
+            <ui:CardControl.Header>
+                <StackPanel>
+                    <ui:TextBlock>Toolbar hotkey</ui:TextBlock>
+                    <ui:TextBlock Foreground="{ui:ThemeResource TextFillColorSecondaryBrush}">Define a key combination which opens the toolbar</ui:TextBlock>
+                </StackPanel>
+            </ui:CardControl.Header>
+            <controls:HotkeyEditor Hotkey="{Binding MenuHotKey}" />
+        </ui:CardControl>
+
+    </StackPanel>
+</Page>

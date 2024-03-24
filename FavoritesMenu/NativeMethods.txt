@@ -20,3 +20,5 @@ ImageList_GetIcon
 SetForegroundWindow
 DeleteObject
 GetCursorPos
+RegisterHotKey
+UnregisterHotKey
