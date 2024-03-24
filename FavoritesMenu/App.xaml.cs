@@ -1,80 +1,68 @@
-﻿using System.Collections.ObjectModel;
-using System.Configuration;
-using System.Data;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
-using System.Windows.Automation;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+﻿using System.Windows;
+using FavoritesMenu.Services;
 using FavoritesMenu.ViewModels;
 using FavoritesMenu.Views;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Wpf.Ui;
 
 namespace FavoritesMenu;
-/// <summary>
-/// Interaction logic for App.xaml
-/// </summary>
+
 public partial class App : Application
 {
     private H.NotifyIcon.TaskbarIcon taskbarIcon = null!;
 
-    internal static App CurrentApp { get; private set; } = null!;
+    private IHost host;
+
+    public App()
+    {
+        this.host = new HostBuilder()
+            .ConfigureServices((hostContext, services) =>
+            {
+                // Register UI
+                services.AddSingleton<MainWindow>();
+                services.AddSingleton<AboutPage>();
+                services.AddSingleton<SearchPage>();
+                services.AddSingleton<SettingsPage>();
+
+                // Register View Models
+                services.AddSingleton<MainWindowViewModel>();
+                services.AddSingleton<AboutViewModel>();
+                services.AddSingleton<SettingsViewModel>();
+                services.AddSingleton<SearchViewModel>();
+                services.AddSingleton<NotifyIconViewModel>();
+
+                // Services
+                services.AddSingleton<IPageService, PageService>();
+                services.AddSingleton<INavigationService, Services.NavigationService>();
+                services.AddSingleton<ItemDataService>();
+            }).Build();
+    }
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        App.CurrentApp = this;
+        this.host.Start();
 
         this.taskbarIcon = (H.NotifyIcon.TaskbarIcon)FindResource("TaskbarIcon");
 
-        ((NotifyIconViewModel)this.taskbarIcon.DataContext).RefreshItems();
+        NotifyIconViewModel notifyVm = this.host.Services.GetRequiredService<NotifyIconViewModel>();
+        this.taskbarIcon.DataContext = notifyVm;
+
+        ItemDataService itemDataService = this.host.Services.GetRequiredService<ItemDataService>();
+
+        itemDataService.UpdateItems(SettingsViewModel.GetToolbarPath());
 
         this.taskbarIcon.ForceCreate();
 
-        new MainWindow() { DataContext = new MainWindowViewModel() }.Show();
+        this.host.Services.GetRequiredService<MainWindow>().Show();
     }
 
-    //private List<ItemData> AddDirectory(string path)
-    //{
-    //    var menuItems = (from d in new DirectoryInfo(path).GetFileSystemInfos("*", new EnumerationOptions() { IgnoreInaccessible = true })
-    //                     where !d.Attributes.HasFlag(FileAttributes.Hidden)
-    //                     let i = new ItemData(Shell.GetDisplayName(d.FullName), d.FullName, d is FileInfo, Shell.GetFileIcon(d.FullName))
-    //                     select i).ToList();
+    protected override void OnExit(ExitEventArgs e)
+    {
+        using (this.host)
+            host.StopAsync().Wait();
 
-    //    menuItems.Sort((x, y) =>
-    //    {
-    //        int result = x.IsFile.CompareTo(y.IsFile);
-    //        if (result != 0)
-    //            return result;
-
-    //        return string.Compare(x.DisplayName, y.DisplayName, true);
-    //    });
-
-    //    foreach (var directoryItem in menuItems)
-    //    {
-    //        if (!directoryItem.IsFile)
-    //            directoryItem.SubItems.AddRange(AddDirectory(directoryItem.FullPath));
-    //    }
-
-    //    return menuItems;
-    //}
-
-    //private void RefreshItems()
-    //{
-    //    string path = SettingsViewModel.GetToolbarPath();
-
-    //    try
-    //    {
-    //        var items = new ObservableCollection<ItemData>(AddDirectory(path));
-
-    //        this.taskbarIcon.ContextMenu.ItemsSource = items;
-    //    }
-    //    catch
-    //    {
-    //        NotifyIconViewModel vm = (NotifyIconViewModel)this.taskbarIcon.DataContext;
-    //        vm.ShowSettings(true);
-    //    }
-    //}
+        base.OnExit(e);
+    }
 }
 

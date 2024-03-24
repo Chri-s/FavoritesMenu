@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace FavoritesMenu;
@@ -29,6 +27,7 @@ public class ItemData
     public bool IsFile { get; init; }
 
     public ImageSource? ImageSource { get; init; }
+
     public ImageSource? LargeImageSource { get; init; }
 
     public List<ItemData> SubItems { get; } = new();

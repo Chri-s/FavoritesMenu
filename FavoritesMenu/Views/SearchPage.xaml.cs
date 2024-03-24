@@ -12,17 +12,22 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FavoritesMenu.ViewModels;
 
-namespace FavoritesMenu.Views
+namespace FavoritesMenu.Views;
+
+internal partial class SearchPage : Page, INotifyNavigated
 {
-    /// <summary>
-    /// Interaction logic for SearchPage.xaml
-    /// </summary>
-    public partial class SearchPage : Page
+    public SearchPage(SearchViewModel viewModel)
     {
-        public SearchPage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+
+        this.DataContext = viewModel;
+    }
+
+    public void Navigated()
+    {
+        this.searchTextBox.Focus();
+        this.searchTextBox.SelectionStart = this.searchTextBox.Text.Length;
     }
 }

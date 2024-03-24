@@ -1,50 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FavoritesMenu.Views;
+using FavoritesMenu.Services;
 
 
 namespace FavoritesMenu.ViewModels;
 
 internal partial class NotifyIconViewModel : ObservableObject
 {
-    private SettingsWindow? settingsWindow;
-
-    private List<object> rootItems = null!;
+    private readonly MainWindowViewModel mainWindowViewModel;
+    private readonly ItemDataService itemDataService;
 
     private SearchItemViewModel searchVm = new SearchItemViewModel();
 
-    public NotifyIconViewModel()
+    public NotifyIconViewModel(MainWindowViewModel mainWindowViewModel, ItemDataService itemDataService)
     {
-        this.searchVm.PropertyChanged += SearchVm_PropertyChanged;
+        this.mainWindowViewModel = mainWindowViewModel;
+        this.itemDataService = itemDataService;
+
+        this.itemDataService.PropertyChanged += ItemDataService_PropertyChanged;
     }
 
-    private void SearchVm_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void ItemDataService_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(searchVm.SearchString))
-            return;
-
-        if (string.IsNullOrEmpty(searchVm.SearchString))
+        if (e.PropertyName == nameof(ItemDataService.RootItems))
         {
-            this.Items = rootItems;
-        }
-        else
-        {
-            List<object> items = this.rootItems.OfType<ItemData>()
-                                              .Where(i => i.DisplayName.Contains(searchVm.SearchString, StringComparison.OrdinalIgnoreCase))
-                                              .Cast<object>()
-                                              .Append(this.searchVm)
-                                              .ToList();
+            List<object> menuItems = new(this.itemDataService.RootItems ?? Enumerable.Empty<object>());
+            menuItems.Add(searchVm);
 
-            this.Items = items;
+            this.Items = menuItems;
         }
     }
 
@@ -54,56 +43,7 @@ internal partial class NotifyIconViewModel : ObservableObject
     [RelayCommand]
     public void RefreshItems()
     {
-        string path = SettingsViewModel.GetToolbarPath();
-
-        try
-        {
-            List<ItemData> allItems = new();
-            List<ItemData> itemData = AddDirectory(path, string.Empty, allItems);
-            this.rootItems = itemData.Cast<object>().Append(searchVm).ToList();
-            this.Items = rootItems;
-
-            this.searchVm.Items = allItems;
-        }
-        catch
-        {
-            this.ShowSettings(true);
-        }
-    }
-
-    private List<ItemData> AddDirectory(string path, string folderPath, List<ItemData> allItems)
-    {
-        var menuItems = (from d in new DirectoryInfo(path).GetFileSystemInfos("*", new EnumerationOptions() { IgnoreInaccessible = true })
-                         where !d.Attributes.HasFlag(FileAttributes.Hidden)
-                         let i = new ItemData(Shell.GetDisplayName(d.FullName), d.FullName, folderPath, d is FileInfo, Shell.GetFileIcon(d.FullName), Shell.GetLargeFileIcon(d.FullName))
-                         select i).ToList();
-
-        menuItems.Sort((x, y) =>
-        {
-            int result = x.IsFile.CompareTo(y.IsFile);
-            if (result != 0)
-                return result;
-
-            return string.Compare(x.DisplayName, y.DisplayName, true);
-        });
-
-        string folderPathWithSeparator = folderPath + ((folderPath.Length > 0) ? " > " : string.Empty);
-
-        foreach (var directoryItem in menuItems)
-        {
-            if (!directoryItem.IsFile)
-            {
-                string displayName = Shell.GetDisplayName(directoryItem.FullPath);
-                string itemFolderPath = folderPathWithSeparator + displayName;
-                directoryItem.SubItems.AddRange(AddDirectory(directoryItem.FullPath, itemFolderPath, allItems));
-            }
-            else
-            {
-                allItems.Add(directoryItem);
-            }
-        }
-
-        return menuItems;
+        this.itemDataService.UpdateItems();
     }
 
     [RelayCommand]
@@ -131,28 +71,31 @@ internal partial class NotifyIconViewModel : ObservableObject
 
     private void ShowSettings(bool toolbarPathIsInvalid)
     {
-        if (this.settingsWindow != null)
-        {
-            this.settingsWindow.Focus();
-            return;
-        }
+        this.mainWindowViewModel.SelectedNavigationViewItem = this.mainWindowViewModel.SettingsViewItem;
+        this.mainWindowViewModel.ShowMainWindow();
+        //if (this.settingsWindow != null)
+        //{
+        //    this.settingsWindow.Focus();
+        //    return;
+        //}
 
-        this.settingsWindow = new();
-        SettingsViewModel vm = new SettingsViewModel();
-        settingsWindow.DataContext = vm;
+        //this.settingsWindow = new();
+        //SettingsViewModel vm = new SettingsViewModel();
+        //settingsWindow.DataContext = vm;
 
-        settingsWindow.Closed += delegate { this.settingsWindow = null; };
+        //settingsWindow.Closed += delegate { this.settingsWindow = null; };
 
-        if (!(settingsWindow.ShowDialog() ?? false))
-            return;
+        //if (!(settingsWindow.ShowDialog() ?? false))
+        //    return;
 
-        this.RefreshItems();
+        //this.RefreshItems();
     }
 
     [RelayCommand]
     private void ShowAboutWindow()
     {
-        new AboutWindow().Show();
+        this.mainWindowViewModel.SelectedNavigationViewItem = this.mainWindowViewModel.AboutViewItem;
+        this.mainWindowViewModel.ShowMainWindow();
     }
 
     [RelayCommand]

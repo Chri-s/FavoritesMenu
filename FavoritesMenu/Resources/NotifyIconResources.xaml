@@ -73,8 +73,5 @@
             MenuActivation="LeftClick"
             behaviors:RightClickBehaviors.TrayRightClickContextMenu="{StaticResource RightClickMenu}"
             ContextMenu="{StaticResource SysTrayMenu}">
-        <tb:TaskbarIcon.DataContext>
-            <vm:NotifyIconViewModel />
-        </tb:TaskbarIcon.DataContext>
     </tb:TaskbarIcon>
 </ResourceDictionary>
