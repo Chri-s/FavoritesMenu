@@ -39,25 +39,6 @@
 
     <ContextMenu x:Key="SysTrayMenu" x:Shared="false" ItemsSource="{Binding Items}" ItemContainerStyleSelector="{StaticResource MenuItemStyleSelector}" />
 
-
-    <!--  This is copied from the Wpf.UI TextBlock style.
-          If a text contains an underscore ("_"), the TextBlock is replaced with AccessText.
-          Wpf.Ui doesn't style the AccessText so has another look than text without underscore.
-          This gives AccessText the same look as TextBlock. -->
-    <Style TargetType="{x:Type AccessText}">
-
-        <!--<Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>-->
-
-        <!--  The Display option causes a large aliasing effect  -->
-        <!--<Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />-->
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="Margin" Value="0" />
-        <Setter Property="Focusable" Value="False" />
-        <Setter Property="SnapsToDevicePixels" Value="True" />
-        <Setter Property="OverridesDefaultStyle" Value="True" />
-    </Style>
-
     <ContextMenu x:Key="RightClickMenu" x:Shared="false">
         <MenuItem Header="Refresh" Command="{Binding RefreshItemsCommand}" />
         <MenuItem Header="Settings" Command="{Binding ShowSettingsCommand}" />
