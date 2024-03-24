@@ -66,6 +66,10 @@ internal partial class MainWindowViewModel : ObservableObject
 
     partial void OnSelectedNavigationViewItemChanged(INavigationViewItem value)
     {
+        // The NavigationView crashes if we navigate to a page and the MainWindow has not yet been shown. 
+        if (!this.IsMainWindowShown)
+            this.MainWindow.Show();
+
         if (value != null && this.navigationService.GetNavigationControl().SelectedItem != value)
             this.navigationService.Navigate(value.TargetPageType!);
     }

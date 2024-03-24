@@ -14,7 +14,7 @@ internal partial class MainWindow : IMainWindow
 {
     private readonly MainWindowViewModel viewModel;
 
-    public MainWindow(MainWindowViewModel viewModel, IPageService pageService, INavigationService navigationService)
+    public MainWindow(MainWindowViewModel viewModel, IPageService pageService, INavigationService navigationService, IServiceProvider serviceProvider)
     {
         this.viewModel = viewModel;
 
@@ -23,6 +23,7 @@ internal partial class MainWindow : IMainWindow
         this.DataContext = viewModel;
 
         this.NavigationView.SetPageService(pageService);
+        this.NavigationView.SetServiceProvider(serviceProvider);
         navigationService.SetNavigationControl(this.NavigationView);
     }
 

@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FavoritesMenu.Services;
 using Microsoft.Win32;
 
 namespace FavoritesMenu.ViewModels;
@@ -23,8 +24,12 @@ internal partial class SettingsViewModel : ObservableObject
 
     private bool isInitializing = true;
 
-    public SettingsViewModel()
+    private readonly ItemDataService itemDataService;
+
+    public SettingsViewModel(ItemDataService itemDataService)
     {
+        this.itemDataService = itemDataService;
+
         using var runKey = Registry.CurrentUser.CreateSubKey(RunKeyName, false);
 
         object? value = runKey.GetValue(RunValueName);
@@ -75,12 +80,19 @@ internal partial class SettingsViewModel : ObservableObject
         {
             using (var softwareKey = Registry.CurrentUser.CreateSubKey(SettingsKeyName))
                 softwareKey.SetValue(MenuPathValueName, this.ToolbarPath);
-
-            // TODO: Refresh
         }
         catch (Exception ex)
         {
             MessageBox.Show("An error occured while saving the toolbar path: " + ex.Message, "Settings - Favorites Menu");
+        }
+
+        try
+        {
+            this.itemDataService.UpdateItems(this.ToolbarPath);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("An error occured while updating the toolbar: " + ex.Message, "Settings - Favorites Menu");
         }
     }
 
