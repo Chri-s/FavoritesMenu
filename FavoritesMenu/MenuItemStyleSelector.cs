@@ -10,15 +10,19 @@ namespace FavoritesMenu;
 
 public class MenuItemStyleSelector : StyleSelector
 {
-    public Style DefaultMenuItemStyle { get; set; }
+    public Style DefaultMenuItemStyle { get; set; } = null!;
 
-    public Style SearchMenuItemStyle { get; set; }
+    public Style SearchMenuItemStyle { get; set; } = null!;
+
+    public Style SeparatorStyle { get; set; } = null!;
 
     public override Style SelectStyle(object item, DependencyObject container)
     {
-        if (item is ItemData)
-            return DefaultMenuItemStyle;
-
-        return SearchMenuItemStyle;
+        return item switch
+        {
+            ItemData => DefaultMenuItemStyle,
+            Separator => SeparatorStyle,
+            _ => SearchMenuItemStyle,
+        };
     }
 }

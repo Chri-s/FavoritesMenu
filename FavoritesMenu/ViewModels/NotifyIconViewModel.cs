@@ -15,13 +15,13 @@ internal partial class NotifyIconViewModel : ObservableObject
 {
     private readonly MainWindowViewModel mainWindowViewModel;
     private readonly ItemDataService itemDataService;
+    private readonly SearchItemViewModel searchVm;
 
-    private SearchItemViewModel searchVm = new SearchItemViewModel();
-
-    public NotifyIconViewModel(MainWindowViewModel mainWindowViewModel, ItemDataService itemDataService)
+    public NotifyIconViewModel(MainWindowViewModel mainWindowViewModel, ItemDataService itemDataService, SearchItemViewModel searchItemViewModel)
     {
         this.mainWindowViewModel = mainWindowViewModel;
         this.itemDataService = itemDataService;
+        this.searchVm = searchItemViewModel;
 
         this.itemDataService.PropertyChanged += ItemDataService_PropertyChanged;
     }
@@ -31,6 +31,7 @@ internal partial class NotifyIconViewModel : ObservableObject
         if (e.PropertyName == nameof(ItemDataService.RootItems))
         {
             List<object> menuItems = new(this.itemDataService.RootItems ?? Enumerable.Empty<object>());
+            menuItems.Add(new System.Windows.Controls.Separator());
             menuItems.Add(searchVm);
 
             this.Items = menuItems;

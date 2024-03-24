@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using FavoritesMenu.Services;
 using FavoritesMenu.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Wpf.Ui;
@@ -15,7 +15,7 @@ internal partial class MainWindowViewModel : ObservableObject
 {
     private readonly INavigationService navigationService;
     private readonly IServiceProvider serviceProvider;
-    private MainWindow? mainWindow;
+    private IMainWindow? mainWindow;
 
     public INavigationViewItem SearchViewItem { get; init; } = new NavigationViewItem("Search", SymbolRegular.Search16, typeof(SearchPage));
 
@@ -45,13 +45,24 @@ internal partial class MainWindowViewModel : ObservableObject
         };
     }
 
-    public void ShowMainWindow()
-    {
-        if (this.mainWindow == null)
-            this.mainWindow = this.serviceProvider.GetRequiredService<MainWindow>();
+    public void ShowMainWindow() => this.MainWindow.Show();
 
-        this.mainWindow.Show();
+    public void HideMainWindow() => this.MainWindow.Hide();
+
+    public bool ActivateMainWindow() => this.MainWindow.Activate();
+
+    private IMainWindow MainWindow
+    {
+        get
+        {
+            if (this.mainWindow == null)
+                this.mainWindow = this.serviceProvider.GetRequiredService<IMainWindow>();
+
+            return this.mainWindow;
+        }
     }
+
+    public bool IsMainWindowShown { get => this.MainWindow.Visibility == System.Windows.Visibility.Visible; }
 
     partial void OnSelectedNavigationViewItemChanged(INavigationViewItem value)
     {

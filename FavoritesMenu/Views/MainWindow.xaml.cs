@@ -4,12 +4,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using FavoritesMenu.Services;
 using FavoritesMenu.ViewModels;
 using Wpf.Ui;
 
 namespace FavoritesMenu.Views;
 
-internal partial class MainWindow
+internal partial class MainWindow : IMainWindow
 {
     private readonly MainWindowViewModel viewModel;
 

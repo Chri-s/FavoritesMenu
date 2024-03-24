@@ -13,8 +13,11 @@ namespace FavoritesMenu.Views;
 
 internal partial class SearchPage : Page, INotifyNavigated
 {
+    private readonly SearchViewModel viewModel;
     public SearchPage(SearchViewModel viewModel)
     {
+        this.viewModel = viewModel;
+
         InitializeComponent();
 
         this.DataContext = viewModel;
@@ -31,8 +34,8 @@ internal partial class SearchPage : Page, INotifyNavigated
 
     public void Navigated()
     {
+        this.viewModel.SearchPageActivated();
         this.searchTextBox.Focus();
-        this.searchTextBox.SelectionStart = this.searchTextBox.Text.Length;
     }
 
     private void searchTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -62,10 +65,5 @@ internal partial class SearchPage : Page, INotifyNavigated
 
             this.resultListView.ScrollIntoView(this.resultListView.Items[this.resultListView.SelectedIndex]);
         }
-    }
-
-    private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-    {
-
     }
 }

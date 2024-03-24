@@ -26,16 +26,17 @@
     </Style>
 
     <Style TargetType="{x:Type MenuItem}" x:Key="SearchMenuItemStyle">
-        <Setter Property="HeaderTemplate">
-            <Setter.Value>
-                <DataTemplate>
-                    <TextBox Text="{Binding SearchString, UpdateSourceTrigger=PropertyChanged}" />
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Header" Value="Search..." />
+        <Setter Property="Icon" Value="{ui:SymbolIcon TextBulletListSquareSearch20}" />
+
+        <Setter Property="Command" Value="{Binding OpenSearchCommand}" />
     </Style>
 
-    <root:MenuItemStyleSelector x:Key="MenuItemStyleSelector" DefaultMenuItemStyle="{StaticResource DefaultMenuItemStyle}" SearchMenuItemStyle="{StaticResource SearchMenuItemStyle}" />
+    <root:MenuItemStyleSelector
+        x:Key="MenuItemStyleSelector"
+        DefaultMenuItemStyle="{StaticResource DefaultMenuItemStyle}"
+        SearchMenuItemStyle="{StaticResource SearchMenuItemStyle}"
+        SeparatorStyle="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}" />
 
     <ContextMenu x:Key="SysTrayMenu" x:Shared="false" ItemsSource="{Binding Items}" ItemContainerStyleSelector="{StaticResource MenuItemStyleSelector}" />
 

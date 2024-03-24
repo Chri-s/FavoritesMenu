@@ -27,6 +27,7 @@
             <ui:TextBox.InputBindings>
                 <KeyBinding Key="Return" Command="{Binding OpenItemCommand}" CommandParameter="{Binding SelectedItem}" />
                 <KeyBinding Gesture="Shift+Return" Command="{Binding OpenContextMenuCommand}" CommandParameter="{Binding SelectedItem}" />
+                <KeyBinding Key="Esc" Command="{Binding HideMainWindowCommand}" />
             </ui:TextBox.InputBindings>
         </ui:TextBox>
 

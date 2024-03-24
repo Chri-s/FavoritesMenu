@@ -15,18 +15,55 @@ namespace FavoritesMenu.ViewModels;
 internal partial class SearchViewModel : ObservableObject
 {
     private readonly ItemDataService itemDataService;
+    private readonly MainWindowViewModel mainWindowViewModel;
 
-    public SearchViewModel(ItemDataService itemDataService)
+    private bool closeAfterSearch = false;
+
+    private bool isNavigatingToSearchPageFromContextMenu = false;
+
+    public SearchViewModel(ItemDataService itemDataService, MainWindowViewModel mainWindowViewModel)
     {
         this.itemDataService = itemDataService;
+        this.mainWindowViewModel = mainWindowViewModel;
 
         this.Source.SortDescriptions.Add(new SortDescription(nameof(ItemData.DisplayName), ListSortDirection.Ascending));
         this.Source.Filter += Source_Filter;
-        this.Source.Source = itemDataService.AllItems;
+        this.Source.Source = itemDataService.AllItems ?? new List<ItemData>();
         this.Source.View.CollectionChanged += View_CollectionChanged;
         this.SelectedItem = this.Source.View.Cast<ItemData>().FirstOrDefault();
 
         this.itemDataService.PropertyChanged += ItemDataService_PropertyChanged;
+    }
+
+    public void OpenSearchWindowForOneSearch()
+    {
+        this.SearchString = string.Empty;
+
+        if (this.mainWindowViewModel.IsMainWindowShown)
+        {
+            this.mainWindowViewModel.SelectedNavigationViewItem = this.mainWindowViewModel.SearchViewItem;
+            this.mainWindowViewModel.ActivateMainWindow();
+            return;
+        }
+
+        /// Open the main window and set the flag <see cref="closeAfterSearch"/> to true
+        /// in <see cref="SearchPageActivated"/>. This closes the main window after the search.
+        this.isNavigatingToSearchPageFromContextMenu = true;
+        this.mainWindowViewModel.SelectedNavigationViewItem = this.mainWindowViewModel.SearchViewItem;
+        this.mainWindowViewModel.ShowMainWindow();
+
+        this.isNavigatingToSearchPageFromContextMenu = false;
+    }
+
+    /// <summary>
+    /// This method should only be called by <see cref="Views.SearchPage"/> is it is navigated.
+    /// </summary>
+    internal void SearchPageActivated()
+    {
+        if (this.isNavigatingToSearchPageFromContextMenu)
+            this.closeAfterSearch = true;
+        else
+            this.closeAfterSearch = false;
     }
 
     private void View_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -54,9 +91,18 @@ internal partial class SearchViewModel : ObservableObject
     [ObservableProperty]
     private ItemData? selectedItem;
 
+    [RelayCommand]
+    private void HideMainWindow()
+    {
+        this.mainWindowViewModel.HideMainWindow();
+    }
+
     [RelayCommand(CanExecute = nameof(CanOpenItem))]
     private void OpenItem(ItemData item)
     {
+        if (closeAfterSearch)
+            this.mainWindowViewModel.HideMainWindow();
+
         ProcessStartInfo psi = new ProcessStartInfo(item.FullPath) { UseShellExecute = true };
         try
         {
@@ -73,6 +119,9 @@ internal partial class SearchViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanOpenContextMenu))]
     private void OpenContextMenu(ItemData item)
     {
+        if (closeAfterSearch)
+            this.mainWindowViewModel.HideMainWindow();
+
         Shell.OpenContextMenu(item.FullPath);
     }
 

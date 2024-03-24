@@ -20,7 +20,7 @@ public partial class App : Application
             .ConfigureServices((hostContext, services) =>
             {
                 // Register UI
-                services.AddSingleton<MainWindow>();
+                services.AddSingleton<IMainWindow, MainWindow>();
                 services.AddSingleton<AboutPage>();
                 services.AddSingleton<SearchPage>();
                 services.AddSingleton<SettingsPage>();
@@ -30,6 +30,7 @@ public partial class App : Application
                 services.AddSingleton<AboutViewModel>();
                 services.AddSingleton<SettingsViewModel>();
                 services.AddSingleton<SearchViewModel>();
+                services.AddSingleton<SearchItemViewModel>();
                 services.AddSingleton<NotifyIconViewModel>();
 
                 // Services
@@ -53,8 +54,6 @@ public partial class App : Application
         itemDataService.UpdateItems(SettingsViewModel.GetToolbarPath());
 
         this.taskbarIcon.ForceCreate();
-
-        this.host.Services.GetRequiredService<MainWindow>().Show();
     }
 
     protected override void OnExit(ExitEventArgs e)
