@@ -3,8 +3,9 @@
                     xmlns:tb="http://www.hardcodet.net/taskbar"
                     xmlns:conv="clr-namespace:FavoritesMenu.Converters"
                     xmlns:root="clr-namespace:FavoritesMenu"
-                    xmlns:behaviors="clr-namespace:FavoritesMenu.Behaviors"
-                    xmlns:vm="clr-namespace:FavoritesMenu.ViewModels">
+                    xmlns:b="clr-namespace:FavoritesMenu.Behaviors"
+                    xmlns:vm="clr-namespace:FavoritesMenu.ViewModels"
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
 
     <BitmapSource x:Key="NotifyIcon">/Resources/Notify.ico</BitmapSource>
 
@@ -20,8 +21,8 @@
         <Setter Property="Command" Value="{Binding DataContext.OpenItemCommand,RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
         <Setter Property="CommandParameter" Value="{Binding}" />
 
-        <Setter Property="behaviors:RightClickBehaviors.Command" Value="{Binding DataContext.OpenContextMenuCommand,RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-        <Setter Property="behaviors:RightClickBehaviors.CommandParameter" Value="{Binding}" />
+        <Setter Property="b:ControlBehaviors.PreviewRightClickCommand" Value="{Binding DataContext.OpenContextMenuCommand,RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+        <Setter Property="b:ControlBehaviors.PreviewRightClickCommandParameter" Value="{Binding}" />
     </Style>
 
     <Style TargetType="{x:Type MenuItem}" x:Key="SearchMenuItemStyle">
@@ -71,7 +72,7 @@
             ToolTipText="Favorites Menu"
             NoLeftClickDelay="True"
             MenuActivation="LeftClick"
-            behaviors:RightClickBehaviors.TrayRightClickContextMenu="{StaticResource RightClickMenu}"
+            b:TaskbarIconBehaviors.TrayRightClickContextMenu="{StaticResource RightClickMenu}"
             ContextMenu="{StaticResource SysTrayMenu}">
     </tb:TaskbarIcon>
 </ResourceDictionary>

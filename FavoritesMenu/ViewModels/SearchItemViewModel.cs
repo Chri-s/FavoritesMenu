@@ -12,15 +12,11 @@ namespace FavoritesMenu.ViewModels;
 
 internal partial class SearchItemViewModel : ObservableObject
 {
-    private readonly SearchWindow searchWindow = new();
-
     [ObservableProperty]
     private List<ItemData> items = new();
 
     public SearchItemViewModel()
     {
-        this.searchWindow.DataContext = this;
-
         this.Source.SortDescriptions.Add(new SortDescription(nameof(ItemData.DisplayName), ListSortDirection.Ascending));
         this.Source.Filter += Source_Filter;
     }
@@ -44,11 +40,11 @@ internal partial class SearchItemViewModel : ObservableObject
 
         if (e.PropertyName == nameof(SearchString))
         {
-            if (!string.IsNullOrEmpty(SearchString) && !searchWindow.IsVisible)
-            {
-                searchWindow.Show();
-                searchWindow.FocusSearchTextBox();
-            }
+            //if (!string.IsNullOrEmpty(SearchString) && !searchWindow.IsVisible)
+            //{
+            //    searchWindow.Show();
+            //    searchWindow.FocusSearchTextBox();
+            //}
 
             this.Source.View.Refresh();
         }
