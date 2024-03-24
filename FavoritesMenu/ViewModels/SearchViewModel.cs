@@ -21,10 +21,12 @@ internal partial class SearchViewModel : ObservableObject
 
     private bool isNavigatingToSearchPageFromContextMenu = false;
 
-    public SearchViewModel(ItemDataService itemDataService, MainWindowViewModel mainWindowViewModel)
+    public SearchViewModel(ItemDataService itemDataService, MainWindowViewModel mainWindowViewModel, HotkeyService hotkeyService)
     {
         this.itemDataService = itemDataService;
         this.mainWindowViewModel = mainWindowViewModel;
+
+        hotkeyService.SearchHotkeyPressed += delegate { this.OpenSearchWindowForOneSearch(); };
 
         this.Source.SortDescriptions.Add(new SortDescription(nameof(ItemData.DisplayName), ListSortDirection.Ascending));
         this.Source.Filter += Source_Filter;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -25,10 +26,12 @@ internal partial class SettingsViewModel : ObservableObject
     private bool isInitializing = true;
 
     private readonly ItemDataService itemDataService;
+    private readonly HotkeyService hotkeyService;
 
-    public SettingsViewModel(ItemDataService itemDataService)
+    public SettingsViewModel(ItemDataService itemDataService, HotkeyService hotkeyService)
     {
         this.itemDataService = itemDataService;
+        this.hotkeyService = hotkeyService;
 
         using var runKey = Registry.CurrentUser.CreateSubKey(RunKeyName, false);
 
@@ -42,6 +45,15 @@ internal partial class SettingsViewModel : ObservableObject
         this.MenuHotKey = GetHotkey(settingsKey, MenuHotkeyValueName);
 
         this.isInitializing = false;
+    }
+
+    public void InitHotkeys()
+    {
+        if (!this.hotkeyService.SetSearchHotkey(this.SearchHotKey))
+            MessageBox.Show($"Could not register the hotkey \"{this.SearchHotKey}\" for the search. It is probably already registered by another application.", "Favorites Menu", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+        if (!this.hotkeyService.SetOpenMenuHotkey(this.MenuHotKey))
+            MessageBox.Show($"Could not register the hotkey \"{this.MenuHotKey}\" to open the toolbar. It is probably already registered by another application.", "Favorites Menu", MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 
     [ObservableProperty]
@@ -105,6 +117,7 @@ internal partial class SettingsViewModel : ObservableObject
             return;
 
         SetHotkey(SearchHotkeyValueName, newValue);
+        this.InitHotkeys();
     }
 
     [ObservableProperty]
@@ -116,6 +129,7 @@ internal partial class SettingsViewModel : ObservableObject
             return;
 
         SetHotkey(MenuHotkeyValueName, newValue);
+        this.InitHotkeys();
     }
 
     [RelayCommand]

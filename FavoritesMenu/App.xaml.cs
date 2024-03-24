@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media;
 using FavoritesMenu.Services;
 using FavoritesMenu.ViewModels;
 using FavoritesMenu.Views;
@@ -37,6 +38,7 @@ public partial class App : Application
                 services.AddSingleton<IPageService, PageService>();
                 services.AddSingleton<INavigationService, Services.NavigationService>();
                 services.AddSingleton<ItemDataService>();
+                services.AddSingleton<HotkeyService>();
             }).Build();
     }
 
@@ -52,6 +54,8 @@ public partial class App : Application
         ItemDataService itemDataService = this.host.Services.GetRequiredService<ItemDataService>();
 
         itemDataService.UpdateItems(SettingsViewModel.GetToolbarPath());
+
+        this.host.Services.GetRequiredService<SettingsViewModel>().InitHotkeys();
 
         this.taskbarIcon.ForceCreate();
     }

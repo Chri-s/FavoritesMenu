@@ -17,11 +17,13 @@ internal partial class NotifyIconViewModel : ObservableObject
     private readonly ItemDataService itemDataService;
     private readonly SearchItemViewModel searchVm;
 
-    public NotifyIconViewModel(MainWindowViewModel mainWindowViewModel, ItemDataService itemDataService, SearchItemViewModel searchItemViewModel)
+    public NotifyIconViewModel(MainWindowViewModel mainWindowViewModel, ItemDataService itemDataService, SearchItemViewModel searchItemViewModel, HotkeyService hotkeyService)
     {
         this.mainWindowViewModel = mainWindowViewModel;
         this.itemDataService = itemDataService;
         this.searchVm = searchItemViewModel;
+
+        hotkeyService.OpenMenuHotkeyPressed += delegate { this.IsContextMenuOpen = true; };
 
         this.itemDataService.PropertyChanged += ItemDataService_PropertyChanged;
     }
@@ -37,6 +39,9 @@ internal partial class NotifyIconViewModel : ObservableObject
             this.Items = menuItems;
         }
     }
+
+    [ObservableProperty]
+    private bool isContextMenuOpen;
 
     [ObservableProperty]
     private List<object> items = new();
@@ -68,28 +73,10 @@ internal partial class NotifyIconViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ShowSettings() => ShowSettings(false);
-
-    private void ShowSettings(bool toolbarPathIsInvalid)
+    private void ShowSettings()
     {
         this.mainWindowViewModel.SelectedNavigationViewItem = this.mainWindowViewModel.SettingsViewItem;
         this.mainWindowViewModel.ShowMainWindow();
-        //if (this.settingsWindow != null)
-        //{
-        //    this.settingsWindow.Focus();
-        //    return;
-        //}
-
-        //this.settingsWindow = new();
-        //SettingsViewModel vm = new SettingsViewModel();
-        //settingsWindow.DataContext = vm;
-
-        //settingsWindow.Closed += delegate { this.settingsWindow = null; };
-
-        //if (!(settingsWindow.ShowDialog() ?? false))
-        //    return;
-
-        //this.RefreshItems();
     }
 
     [RelayCommand]
