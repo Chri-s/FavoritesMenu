@@ -33,7 +33,8 @@
 
         <ui:ListView ItemsSource="{Binding Source.View}" Margin="0,10,0,0" SelectedItem="{Binding SelectedItem}" x:Name="resultListView">
             <ui:ListView.Resources>
-                <Style TargetType="ListViewItem" BasedOn="{StaticResource ListViewItemStyle}">
+                <Style TargetType="{x:Type ui:ListViewItem}" BasedOn="{StaticResource ListViewItemStyle}">
+                    <Setter Property="Background" Value="Red" />
                     <Setter Property="b:ControlBehaviors.DoubleClickCommand" Value="{Binding Path=DataContext.OpenItemCommand, RelativeSource={RelativeSource AncestorType=ListView}}" />
                     <Setter Property="b:ControlBehaviors.DoubleClickCommandParameter" Value="{Binding}" />
 
