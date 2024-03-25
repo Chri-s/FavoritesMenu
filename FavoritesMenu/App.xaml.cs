@@ -53,7 +53,15 @@ public partial class App : Application
 
         ItemDataService itemDataService = this.host.Services.GetRequiredService<ItemDataService>();
 
-        itemDataService.UpdateItems(SettingsViewModel.GetToolbarPath());
+        try
+        {
+            itemDataService.UpdateItems(SettingsViewModel.GetToolbarPath());
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Could not open the toolbar path \"{SettingsViewModel.GetToolbarPath()}\": {ex.Message}\r\n\r\nPlease select a new path in the settings.", "Favorites menu", MessageBoxButton.OK, MessageBoxImage.Error);
+            this.host.Services.GetRequiredService<NotifyIconViewModel>().ShowSettingsCommand.Execute(null);
+        }
 
         this.host.Services.GetRequiredService<SettingsViewModel>().InitHotkeys();
 
