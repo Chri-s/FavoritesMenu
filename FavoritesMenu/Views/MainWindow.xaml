@@ -13,7 +13,7 @@
         WindowCornerPreference="Default"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
-        Title="Favorites Menu" Height="450" Width="800">
+        Title="Favorites Menu" Height="600" Width="850">
     <Grid>
         <ui:NavigationView
             x:Name="NavigationView"

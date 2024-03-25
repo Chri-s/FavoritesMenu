@@ -45,10 +45,10 @@ internal partial class ItemDataService : ObservableObject
 
     public void UpdateItems(string path)
     {
+        this.Path = path;
         List<ItemData> allItems = new();
         var rootItems = AddDirectory(path, string.Empty, allItems);
 
-        this.Path = path;
         this.AllItems = allItems;
         this.RootItems = rootItems;
     }

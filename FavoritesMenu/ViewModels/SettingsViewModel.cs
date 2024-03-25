@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
@@ -143,6 +144,20 @@ internal partial class SettingsViewModel : ObservableObject
         if (openFolderDialog.ShowDialog() ?? false)
         {
             this.ToolbarPath = openFolderDialog.FolderName;
+        }
+    }
+
+    [RelayCommand]
+    private void OpenFolder()
+    {
+        try
+        {
+            string explorerPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
+            Process.Start(new ProcessStartInfo(explorerPath, @$"""{this.ToolbarPath}"""));
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("Could not open folder: " + ex.Message, "Favorites Menu - Open folder");
         }
     }
 

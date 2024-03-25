@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FavoritesMenu.Services;
@@ -16,9 +17,11 @@ internal partial class NotifyIconViewModel : ObservableObject
     private readonly MainWindowViewModel mainWindowViewModel;
     private readonly ItemDataService itemDataService;
     private readonly SearchItemViewModel searchVm;
+    private readonly IMainWindow mainWindow;
 
-    public NotifyIconViewModel(MainWindowViewModel mainWindowViewModel, ItemDataService itemDataService, SearchItemViewModel searchItemViewModel, HotkeyService hotkeyService)
+    public NotifyIconViewModel(MainWindowViewModel mainWindowViewModel, ItemDataService itemDataService, SearchItemViewModel searchItemViewModel, HotkeyService hotkeyService, IMainWindow mainWindow)
     {
+        this.mainWindow = mainWindow;
         this.mainWindowViewModel = mainWindowViewModel;
         this.itemDataService = itemDataService;
         this.searchVm = searchItemViewModel;
@@ -49,7 +52,16 @@ internal partial class NotifyIconViewModel : ObservableObject
     [RelayCommand]
     public void RefreshItems()
     {
-        this.itemDataService.UpdateItems();
+        try
+        {
+            this.itemDataService.UpdateItems();
+        }
+        catch (Exception ex)
+        {
+            // The message box closes instantly if the window is not specified.
+            MessageBox.Show((Window)this.mainWindow, $"Could not open the toolbar path \"{SettingsViewModel.GetToolbarPath()}\": {ex.Message}\r\n\r\nPlease select a new path in the settings.", "Favorites menu", MessageBoxButton.OK, MessageBoxImage.Error);
+            this.ShowSettings();
+        }
     }
 
     [RelayCommand]

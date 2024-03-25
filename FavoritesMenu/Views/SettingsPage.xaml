@@ -36,7 +36,10 @@
                 </Grid>
             </ui:CardControl.Header>
 
-            <ui:Button Command="{Binding BrowseFolderCommand}">Browse ...</ui:Button>
+            <StackPanel Orientation="Horizontal">
+                <ui:Button Icon="{ui:SymbolIcon FolderOpen16}" Command="{Binding OpenFolderCommand}" Margin="0,0,10,0" Height="{Binding ActualHeight, ElementName=browseFolderButton, Mode=OneWay}" ToolTip="Open folder" />
+                <ui:Button x:Name="browseFolderButton" Command="{Binding BrowseFolderCommand}">Browse ...</ui:Button>
+            </StackPanel>
         </ui:CardControl>
 
         <ui:TextBlock
