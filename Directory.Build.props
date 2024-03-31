@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+	<PropertyGroup>
+		<!-- This sets the version of FavoritesMenu.exe and the Setup file -->
+		<MyVersion>1.0.0.0</MyVersion>
+	</PropertyGroup>
+</Project>

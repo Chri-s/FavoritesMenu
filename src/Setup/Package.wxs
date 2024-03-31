@@ -1,0 +1,32 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+	 xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+	<!-- Change version in Directory.Build.props -->
+	<Package Name="Favorites Menu" Manufacturer="chri-s" Version="$(Version)" UpgradeCode="6440f408-a960-474e-9b57-5009df4daaf2" Compressed="yes">
+		<MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+		<MediaTemplate EmbedCab="true" CompressionLevel="high" />
+
+		<Feature Id="Main">
+			<ComponentGroupRef Id="HarvestedComponents" />
+			<ComponentGroupRef Id="AppComponents"/>
+		</Feature>
+
+		<Property Id="INSTALLFOLDER">
+			<!-- Check for INSTALLFOLDER in the registry. This gets written by cmpREGISTRYINSTALLFOLDER.
+			     This is needed for an upgrade installation to install the upgrade to the same path as the
+				 original installation. -->
+			<RegistrySearch Id="FavoritesMenuRegistry" Type="raw" Root="HKLM" Key="Software\[Manufacturer]\[ProductName]" Name="InstallPath" />
+		</Property>
+
+		<Property Id="DISABLEADVTSHORTCUTS" Value="1" />
+
+		<Icon Id="AppIcon" SourceFile="..\FavoritesMenu\Resources\Notify.ico" />
+		<Property Id="ARPPRODUCTICON" Value="AppIcon" />
+		<Property Id="ARPURLINFOABOUT" Value="https://github.com/Chri-s/FavoritesMenu" />
+
+		<ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+
+		<WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+	</Package>
+</Wix>

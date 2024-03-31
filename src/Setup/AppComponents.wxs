@@ -1,0 +1,16 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Fragment>
+		<ComponentGroup Id="AppComponents" Directory="INSTALLFOLDER">
+			<Component Id="cmdFAVORITESMENU.EXE" Guid="*">
+				<File Id="filFAVORITESMENU.EXE" KeyPath="yes" Source="SourceDir\FavoritesMenu.exe" Checksum="true">
+					<Shortcut Name="Favorites Menu" Directory="ProgramMenuFolder" Advertise="yes" WorkingDirectory="INSTALLFOLDER" />
+				</File>
+			</Component>
+
+			<!-- Save the INSTALLFOLDER to the registry. So we can use it for an upgrade installation. -->
+			<Component Id="cmpREGISTRYINSTALLFOLDER">
+				<RegistryValue Id="regINSTALLFOLDER" Root="HKLM" Key="Software\[Manufacturer]\[ProductName]" Name="InstallPath" Action="write" Type="string" Value="[INSTALLFOLDER]" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>

@@ -12,6 +12,9 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<ApplicationIcon>Resources\Notify.ico</ApplicationIcon>
 		<AssemblyName>FavoritesMenu</AssemblyName>
+		<!-- Change version in Directory.Build.props -->
+		<AssemblyVersion>$(MyVersion)</AssemblyVersion>
+		<FileVersion>$(MyVersion)</FileVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
