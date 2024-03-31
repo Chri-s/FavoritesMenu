@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using FavoritesMenu.Services;
 using FavoritesMenu.ViewModels;
@@ -46,6 +47,8 @@ public partial class App : Application
     {
         this.host.Start();
 
+        Wpf.Ui.Appearance.ApplicationThemeManager.Changed += ApplicationThemeManager_Changed;
+
         this.taskbarIcon = (H.NotifyIcon.TaskbarIcon)FindResource("TaskbarIcon");
 
         NotifyIconViewModel notifyVm = this.host.Services.GetRequiredService<NotifyIconViewModel>();
@@ -66,6 +69,15 @@ public partial class App : Application
         this.host.Services.GetRequiredService<SettingsViewModel>().InitHotkeys();
 
         this.taskbarIcon.ForceCreate();
+    }
+
+    private void ApplicationThemeManager_Changed(Wpf.Ui.Appearance.ApplicationTheme currentApplicationTheme, Color systemAccent)
+    {
+        ContextMenu contextMenu = this.taskbarIcon.ContextMenu;
+        Wpf.Ui.Appearance.ApplicationThemeManager.Apply(contextMenu);
+
+        contextMenu = Behaviors.TaskbarIconBehaviors.GetTrayRightClickContextMenu(this.taskbarIcon);
+        Wpf.Ui.Appearance.ApplicationThemeManager.Apply(contextMenu);
     }
 
     protected override void OnExit(ExitEventArgs e)

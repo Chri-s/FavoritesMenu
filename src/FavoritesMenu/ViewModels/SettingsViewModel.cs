@@ -21,6 +21,7 @@ internal partial class SettingsViewModel : ObservableObject
     private const string MenuPathValueName = "MenuPath";
     private const string SearchHotkeyValueName = "SearchHotkey";
     private const string MenuHotkeyValueName = "MenuHotkey";
+    private const string ThemeValueName = "Theme";
 
     private readonly string ValueForStartup = $"\"{Environment.ProcessPath}\"";
 
@@ -28,11 +29,13 @@ internal partial class SettingsViewModel : ObservableObject
 
     private readonly ItemDataService itemDataService;
     private readonly HotkeyService hotkeyService;
+    private readonly IMainWindow mainWindow;
 
-    public SettingsViewModel(ItemDataService itemDataService, HotkeyService hotkeyService)
+    public SettingsViewModel(ItemDataService itemDataService, HotkeyService hotkeyService, IMainWindow mainWindow)
     {
         this.itemDataService = itemDataService;
         this.hotkeyService = hotkeyService;
+        this.mainWindow = mainWindow;
 
         using var runKey = Registry.CurrentUser.CreateSubKey(RunKeyName, false);
 
@@ -44,6 +47,7 @@ internal partial class SettingsViewModel : ObservableObject
         this.ToolbarPath = GetToolbarPath(settingsKey);
         this.SearchHotKey = GetHotkey(settingsKey, SearchHotkeyValueName);
         this.MenuHotKey = GetHotkey(settingsKey, MenuHotkeyValueName);
+        this.SelectedTheme = GetTheme(settingsKey);
 
         this.isInitializing = false;
     }
@@ -89,15 +93,7 @@ internal partial class SettingsViewModel : ObservableObject
         if (this.isInitializing)
             return;
 
-        try
-        {
-            using (var softwareKey = Registry.CurrentUser.CreateSubKey(SettingsKeyName))
-                softwareKey.SetValue(MenuPathValueName, this.ToolbarPath);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("An error occured while saving the toolbar path: " + ex.Message, "Settings - Favorites Menu");
-        }
+        SaveToolbarPath(value);
 
         try
         {
@@ -107,6 +103,29 @@ internal partial class SettingsViewModel : ObservableObject
         {
             MessageBox.Show("An error occured while updating the toolbar: " + ex.Message, "Settings - Favorites Menu");
         }
+    }
+
+    [ObservableProperty]
+    private List<ThemeViewModel> themes = new List<ThemeViewModel>()
+    {
+        new("Light", "Light", Wpf.Ui.Appearance.ApplicationTheme.Light),
+        new("Dark", "Dark", Wpf.Ui.Appearance.ApplicationTheme.Dark),
+        new("HighContrast", "High contrast", Wpf.Ui.Appearance.ApplicationTheme.HighContrast),
+        new("SystemDefault", "System Default", null),
+    };
+
+    [ObservableProperty]
+    private ThemeViewModel selectedTheme;
+
+    partial void OnSelectedThemeChanged(ThemeViewModel? oldValue, ThemeViewModel newValue)
+    {
+        oldValue?.Revoke((Window)this.mainWindow);
+        newValue.Apply((Window)this.mainWindow);
+
+        if (this.isInitializing)
+            return;
+
+        SaveTheme(newValue.Name);
     }
 
     [ObservableProperty]
@@ -167,6 +186,19 @@ internal partial class SettingsViewModel : ObservableObject
         return GetToolbarPath(settingsKey);
     }
 
+    private static void SaveToolbarPath(string toolbarPath)
+    {
+        try
+        {
+            using (var softwareKey = Registry.CurrentUser.CreateSubKey(SettingsKeyName))
+                softwareKey.SetValue(MenuPathValueName, toolbarPath);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("An error occured while saving the toolbar path: " + ex.Message, "Settings - Favorites Menu");
+        }
+    }
+
     private static RegistryKey GetSettingsRegistryKey(bool writable) => Registry.CurrentUser.CreateSubKey(SettingsKeyName, writable);
 
     private static string GetToolbarPath(RegistryKey settingsKey)
@@ -183,6 +215,31 @@ internal partial class SettingsViewModel : ObservableObject
             return new HotkeyConverter((uint)value);
 
         return null;
+    }
+
+    private ThemeViewModel GetTheme(RegistryKey settingsKey)
+    {
+        if (!(settingsKey.GetValue(ThemeValueName) is string value))
+            return this.Themes.First(t => t.IsSystemDefault);
+
+        ThemeViewModel? theme = this.Themes.FirstOrDefault(t => t.Name == value);
+        if (theme == null)
+            theme = this.Themes.First(t => t.IsSystemDefault);
+
+        return theme;
+    }
+
+    private static void SaveTheme(string name)
+    {
+        try
+        {
+            using (var softwareKey = Registry.CurrentUser.CreateSubKey(SettingsKeyName))
+                softwareKey.SetValue(ThemeValueName, name);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("An error occured while saving the themes: " + ex.Message, "Settings - Favorites Menu");
+        }
     }
 
     private static void SetHotkey(string valueName, HotkeyConverter? hotkey)
