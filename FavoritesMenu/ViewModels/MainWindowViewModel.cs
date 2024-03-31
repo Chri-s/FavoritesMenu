@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using FavoritesMenu.Services;
 using FavoritesMenu.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Windows.Win32;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 
@@ -13,7 +14,7 @@ namespace FavoritesMenu.ViewModels;
 
 internal partial class MainWindowViewModel : ObservableObject
 {
-    private readonly INavigationService navigationService;
+    private readonly Services.NavigationService navigationService;
     private readonly IServiceProvider serviceProvider;
     private IMainWindow? mainWindow;
 
@@ -32,7 +33,7 @@ internal partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private INavigationViewItem selectedNavigationViewItem = null!;
 
-    public MainWindowViewModel(INavigationService navigationService, IServiceProvider serviceProvider)
+    public MainWindowViewModel(Services.NavigationService navigationService, IServiceProvider serviceProvider)
     {
         this.navigationService = navigationService;
         this.serviceProvider = serviceProvider;
@@ -45,11 +46,19 @@ internal partial class MainWindowViewModel : ObservableObject
         };
     }
 
-    public void ShowMainWindow() => this.MainWindow.Show();
+    public void ShowMainWindow()
+    {
+        this.MainWindow.Show();
+        PInvoke.SetForegroundWindow(new Windows.Win32.Foundation.HWND(this.MainWindow.Handle));
+    }
 
     public void HideMainWindow() => this.MainWindow.Hide();
 
-    public bool ActivateMainWindow() => this.MainWindow.Activate();
+    public void ActivateMainWindow()
+    {
+        this.MainWindow.Activate();
+        PInvoke.SetForegroundWindow(new Windows.Win32.Foundation.HWND(this.MainWindow.Handle));
+    }
 
     private IMainWindow MainWindow
     {

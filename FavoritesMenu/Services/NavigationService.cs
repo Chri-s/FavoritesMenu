@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 
@@ -13,6 +14,7 @@ class NavigationService : INavigationService
 {
     private INavigationView navigationView = null!;
     private IPageService pageService;
+    private object? currentPage;
 
     public NavigationService(IPageService pageService)
     {
@@ -45,8 +47,14 @@ class NavigationService : INavigationService
         this.navigationView.Navigated += NavigationView_Navigated;
     }
 
+    public void NotifyCurrentPageActivated()
+    {
+        (this.currentPage as INotifyNavigated)?.Navigated();
+    }
+
     private void NavigationView_Navigated(NavigationView sender, NavigatedEventArgs args)
     {
+        this.currentPage = args.Page;
         (args.Page as INotifyNavigated)?.Navigated();
     }
 

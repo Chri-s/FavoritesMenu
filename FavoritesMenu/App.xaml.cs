@@ -36,7 +36,7 @@ public partial class App : Application
 
                 // Services
                 services.AddSingleton<IPageService, PageService>();
-                services.AddSingleton<INavigationService, Services.NavigationService>();
+                services.AddSingleton<Services.NavigationService>();
                 services.AddSingleton<ItemDataService>();
                 services.AddSingleton<HotkeyService>();
             }).Build();

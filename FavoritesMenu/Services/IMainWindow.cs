@@ -4,16 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 
-namespace FavoritesMenu.Services
+namespace FavoritesMenu.Services;
+
+internal interface IMainWindow
 {
-    interface IMainWindow
-    {
-        void Show();
+    event EventHandler<HotkeyEventArgs>? HotkeyPressed;
 
-        void Hide();
+    void Show();
 
-        bool Activate();
+    void Hide();
 
-        Visibility Visibility { get; }
-    }
+    bool Activate();
+
+    Visibility Visibility { get; }
+
+    nint Handle { get; }
 }

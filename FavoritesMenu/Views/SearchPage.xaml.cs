@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using FavoritesMenu.ViewModels;
 
 namespace FavoritesMenu.Views;
@@ -29,13 +26,29 @@ internal partial class SearchPage : Page, INotifyNavigated
     {
         // Dispatch ScrollIntoView because the resultListView hasn't applied the changed collection yet.
         // If we invoke it after rendering, the resultListView has made the changes from the collection and scrolls to the correct position.
-        await Dispatcher.InvokeAsync(() => this.resultListView.ScrollIntoView(this.resultListView.SelectedItem), System.Windows.Threading.DispatcherPriority.Background);
+        await Dispatcher.InvokeAsync(() =>
+        {
+            if (this.resultListView.SelectedIndex == -1 && this.resultListView.Items.Count > 0)
+                this.resultListView.SelectedIndex = 0;
+
+            this.resultListView.ScrollIntoView(this.resultListView.SelectedItem);
+        }, System.Windows.Threading.DispatcherPriority.Background);
     }
 
     public void Navigated()
     {
         this.viewModel.SearchPageActivated();
         this.searchTextBox.Focus();
+
+        // Dispatch ScrollIntoView because the resultListView hasn't applied the changed collection yet.
+        // If we invoke it after rendering, the resultListView has made the changes from the collection and scrolls to the correct position.
+        Dispatcher.InvokeAsync(() =>
+        {
+            if (this.resultListView.Items.Count > 0)
+                this.resultListView.SelectedIndex = 0;
+
+            this.resultListView.ScrollIntoView(this.resultListView.SelectedItem);
+        }, System.Windows.Threading.DispatcherPriority.Background).Wait();
     }
 
     private void searchTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
