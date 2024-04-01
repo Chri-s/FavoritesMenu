@@ -26,7 +26,11 @@ internal partial class NotifyIconViewModel : ObservableObject
         this.itemDataService = itemDataService;
         this.searchVm = searchItemViewModel;
 
-        hotkeyService.OpenMenuHotkeyPressed += delegate { this.IsContextMenuOpen = true; };
+        hotkeyService.OpenMenuHotkeyPressed += delegate
+        {
+            this.ShouldOpenContextMenu = true;
+            this.ShouldOpenContextMenu = false;
+        };
 
         this.itemDataService.PropertyChanged += ItemDataService_PropertyChanged;
     }
@@ -44,7 +48,7 @@ internal partial class NotifyIconViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    private bool isContextMenuOpen;
+    private bool shouldOpenContextMenu;
 
     [ObservableProperty]
     private List<object> items = new();

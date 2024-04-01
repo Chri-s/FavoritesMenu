@@ -38,7 +38,7 @@
         SearchMenuItemStyle="{StaticResource SearchMenuItemStyle}"
         SeparatorStyle="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}" />
 
-    <ContextMenu x:Key="SysTrayMenu" x:Shared="false" ItemsSource="{Binding Items}" ItemContainerStyleSelector="{StaticResource MenuItemStyleSelector}" IsOpen="{Binding IsContextMenuOpen}" />
+    <ContextMenu x:Key="SysTrayMenu" x:Shared="false" ItemsSource="{Binding Items}" ItemContainerStyleSelector="{StaticResource MenuItemStyleSelector}" />
 
     <ContextMenu x:Key="RightClickMenu" x:Shared="false">
         <MenuItem Header="Refresh" Command="{Binding RefreshItemsCommand}" />
@@ -52,9 +52,9 @@
             x:Key="TaskbarIcon"
             IconSource="{StaticResource NotifyIcon}"
             ToolTipText="Favorites Menu"
-            NoLeftClickDelay="True"
-            MenuActivation="LeftClick"
+            MenuActivation="None"
             b:TaskbarIconBehaviors.TrayRightClickContextMenu="{StaticResource RightClickMenu}"
-            ContextMenu="{StaticResource SysTrayMenu}">
+            b:TaskbarIconBehaviors.TrayLeftClickContextMenu="{StaticResource SysTrayMenu}"
+            b:TaskbarIconBehaviors.ShouldOpenLeftClickContextMenu="{Binding ShouldOpenContextMenu}">
     </tb:TaskbarIcon>
 </ResourceDictionary>
