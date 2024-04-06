@@ -33,14 +33,6 @@ internal partial class ItemDataService : ObservableObject
         private set => this.SetProperty(ref this.path, value);
     }
 
-    public List<ItemData> GetItemsContainingName(string name)
-    {
-        if (this.RootItems == null)
-            return new List<ItemData>();
-
-        return this.RootItems.Where(i => i.DisplayName.Contains(name, StringComparison.CurrentCultureIgnoreCase)).OrderBy(i => i.DisplayName).ToList();
-    }
-
     public void UpdateItems() => this.UpdateItems(this.Path ?? throw new InvalidOperationException("Path has not been initialized. Call UpdateItems(string path) for the first time."));
 
     public void UpdateItems(string path)
