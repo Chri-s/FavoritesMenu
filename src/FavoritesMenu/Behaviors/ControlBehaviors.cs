@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace FavoritesMenu.Behaviors;
 
@@ -128,6 +129,12 @@ internal class ControlBehaviors : DependencyObject
     private static void UiElement_PreviewMouseUp_ForCommand(object control, MouseButtonEventArgs e)
     {
         if (e.ChangedButton != MouseButton.Right)
+            return;
+
+        // If the clicked menu item is in a sub menu, this event is called for the menu item in the root level first (control = root level menu item).
+        // Only if the root menu item doesn't handle it, it is called for the clicked menu item.
+        // Here we check whether the event was called for the root level menu item.
+        if (control != e.OriginalSource && !(e.OriginalSource as DependencyObject).HasVisualParent(control))
             return;
 
         Control uiElement = (Control)control;
