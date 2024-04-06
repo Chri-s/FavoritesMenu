@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Windows.Win32.Foundation;
 
 namespace FavoritesMenu.Services;
 
@@ -78,5 +79,38 @@ internal partial class ItemDataService : ObservableObject
         }
 
         return menuItems;
+    }
+
+    public void StartItem(ItemData item, bool runElevated)
+    {
+        ProcessStartInfo psi = new ProcessStartInfo(item.FullPath) { UseShellExecute = true };
+
+        if (runElevated)
+            psi.Verb = "runas";
+
+        try
+        {
+            Process.Start(psi);
+        }
+        catch (Win32Exception ex) when (ex.NativeErrorCode == (int)WIN32_ERROR.ERROR_NO_ASSOCIATION)
+        {
+            // This happens if we start the process with the verb "runas" but the file can not be opened with runas.
+            // Perhaps because it is not an executable.
+            // Then we start it without a verb
+            psi.Verb = string.Empty;
+
+            try
+            {
+                Process.Start(psi);
+            }
+            catch
+            {
+                // Do nothing
+            }
+        }
+        catch
+        {
+            // Do nothing
+        }
     }
 }

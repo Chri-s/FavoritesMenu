@@ -26,12 +26,13 @@
             PreviewKeyDown="searchTextBox_PreviewKeyDown">
             <ui:TextBox.InputBindings>
                 <KeyBinding Key="Return" Command="{Binding OpenItemCommand}" CommandParameter="{Binding SelectedItem}" />
+                <KeyBinding Gesture="Ctrl+Shift+Return" Command="{Binding OpenItemCommand}" CommandParameter="{Binding SelectedItem}" />
                 <KeyBinding Gesture="Shift+Return" Command="{Binding OpenContextMenuCommand}" CommandParameter="{Binding SelectedItem}" />
                 <KeyBinding Key="Esc" Command="{Binding HideMainWindowCommand}" />
             </ui:TextBox.InputBindings>
         </ui:TextBox>
 
-        <ui:ListView ItemsSource="{Binding Source.View}" Margin="0,10,0,0" SelectedItem="{Binding SelectedItem}" x:Name="resultListView">
+        <ui:ListView ItemsSource="{Binding Source.View}" Margin="0,10,0,0" SelectedItem="{Binding SelectedItem}" x:Name="resultListView" SelectionMode="Single">
             <ui:ListView.Resources>
                 <Style TargetType="{x:Type ui:ListViewItem}" BasedOn="{StaticResource ListViewItemStyle}">
                     <Setter Property="Background" Value="Red" />
@@ -42,6 +43,12 @@
                     <Setter Property="b:ControlBehaviors.RightClickCommandParameter" Value="{Binding}" />
                 </Style>
             </ui:ListView.Resources>
+            <ui:ListView.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding OpenItemCommand}" CommandParameter="{Binding SelectedItem}" />
+                <KeyBinding Gesture="Ctrl+Shift+Return" Command="{Binding OpenItemCommand}" CommandParameter="{Binding SelectedItem}" />
+                <KeyBinding Gesture="Shift+Return" Command="{Binding OpenContextMenuCommand}" CommandParameter="{Binding SelectedItem}" />
+                <KeyBinding Key="Esc" Command="{Binding HideMainWindowCommand}" />
+            </ui:ListView.InputBindings>
             <ui:ListView.ItemTemplate>
                 <DataTemplate DataType="{x:Type root:ItemData}">
                     <Grid Margin="8,0">

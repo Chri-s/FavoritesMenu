@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Data;
+using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FavoritesMenu.Services;
@@ -102,15 +103,7 @@ internal partial class SearchViewModel : ObservableObject
         if (closeAfterSearch)
             this.mainWindowViewModel.HideMainWindow();
 
-        ProcessStartInfo psi = new ProcessStartInfo(item.FullPath) { UseShellExecute = true };
-        try
-        {
-            Process.Start(psi);
-        }
-        catch
-        {
-            // Do nothing
-        }
+        this.itemDataService.StartItem(item, Keyboard.Modifiers == (ModifierKeys.Shift | ModifierKeys.Control));
     }
 
     private bool CanOpenItem(ItemData item) => item != null;

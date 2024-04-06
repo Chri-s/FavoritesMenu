@@ -23,3 +23,4 @@ GetCursorPos
 RegisterHotKey
 UnregisterHotKey
 WM_HOTKEY
+WIN32_ERROR

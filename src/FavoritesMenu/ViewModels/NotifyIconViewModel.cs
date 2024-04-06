@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FavoritesMenu.Services;
+using Windows.Win32.Foundation;
 
 
 namespace FavoritesMenu.ViewModels;
@@ -71,15 +74,7 @@ internal partial class NotifyIconViewModel : ObservableObject
     [RelayCommand]
     private void OpenItem(ItemData item)
     {
-        ProcessStartInfo psi = new ProcessStartInfo(item.FullPath) { UseShellExecute = true };
-        try
-        {
-            Process.Start(psi);
-        }
-        catch
-        {
-            // Do nothing
-        }
+        this.itemDataService.StartItem(item, Keyboard.Modifiers == (ModifierKeys.Shift | ModifierKeys.Control));
     }
 
     [RelayCommand]
