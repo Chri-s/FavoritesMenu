@@ -18,7 +18,7 @@ internal partial class MainWindowViewModel : ObservableObject
     private readonly IServiceProvider serviceProvider;
     private IMainWindow? mainWindow;
 
-    public INavigationViewItem SearchViewItem { get; init; } = new NavigationViewItem("Search", SymbolRegular.Search16, typeof(SearchPage));
+    public INavigationViewItem SearchViewItem { get; init; } = new NavigationViewItem("Search", SymbolRegular.Search16, typeof(ISearchPage));
 
     public INavigationViewItem SettingsViewItem { get; init; } = new NavigationViewItem("Settings", SymbolRegular.Settings24, typeof(SettingsPage));
 

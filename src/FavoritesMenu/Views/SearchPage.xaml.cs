@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Input;
+using FavoritesMenu.Services;
 using FavoritesMenu.ViewModels;
 
 namespace FavoritesMenu.Views;
 
-internal partial class SearchPage : Page, INotifyNavigated
+internal partial class SearchPage : Page, INotifyNavigated, ISearchPage
 {
     private readonly SearchViewModel viewModel;
     public SearchPage(SearchViewModel viewModel)
@@ -49,6 +50,11 @@ internal partial class SearchPage : Page, INotifyNavigated
 
             this.resultListView.ScrollIntoView(this.resultListView.SelectedItem);
         }, System.Windows.Threading.DispatcherPriority.Background).Wait();
+    }
+
+    public void FocusSearchTextBox()
+    {
+        this.searchTextBox.Focus();
     }
 
     private void searchTextBox_PreviewKeyDown(object sender, KeyEventArgs e)

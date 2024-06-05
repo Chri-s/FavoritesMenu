@@ -7,6 +7,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FavoritesMenu.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FavoritesMenu.ViewModels;
 
@@ -14,15 +15,18 @@ internal partial class SearchViewModel : ObservableObject
 {
     private readonly ItemDataService itemDataService;
     private readonly MainWindowViewModel mainWindowViewModel;
+    private readonly IServiceProvider serviceProvider;
+    private ISearchPage? searchPage;
 
     private bool closeAfterSearch = false;
 
     private bool isNavigatingToSearchPageFromContextMenu = false;
 
-    public SearchViewModel(ItemDataService itemDataService, MainWindowViewModel mainWindowViewModel, HotkeyService hotkeyService)
+    public SearchViewModel(ItemDataService itemDataService, MainWindowViewModel mainWindowViewModel, HotkeyService hotkeyService, IServiceProvider serviceProvider)
     {
         this.itemDataService = itemDataService;
         this.mainWindowViewModel = mainWindowViewModel;
+        this.serviceProvider = serviceProvider;
 
         hotkeyService.SearchHotkeyPressed += delegate { this.OpenSearchWindowForOneSearch(); };
 
@@ -43,6 +47,7 @@ internal partial class SearchViewModel : ObservableObject
         {
             this.mainWindowViewModel.SelectedNavigationViewItem = this.mainWindowViewModel.SearchViewItem;
             this.mainWindowViewModel.ActivateMainWindow();
+            this.SearchPage.FocusSearchTextBox();
             return;
         }
 
@@ -51,6 +56,7 @@ internal partial class SearchViewModel : ObservableObject
         this.isNavigatingToSearchPageFromContextMenu = true;
         this.mainWindowViewModel.SelectedNavigationViewItem = this.mainWindowViewModel.SearchViewItem;
         this.mainWindowViewModel.ShowMainWindow();
+        this.SearchPage.FocusSearchTextBox();
 
         this.isNavigatingToSearchPageFromContextMenu = false;
     }
@@ -125,5 +131,16 @@ internal partial class SearchViewModel : ObservableObject
             e.Accepted = true;
         else
             e.Accepted = ((ItemData)e.Item).DisplayName.Contains(this.SearchString, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private ISearchPage SearchPage
+    {
+        get
+        {
+            if (this.searchPage == null)
+                this.searchPage = this.serviceProvider.GetRequiredService<ISearchPage>();
+
+            return this.searchPage;
+        }
     }
 }

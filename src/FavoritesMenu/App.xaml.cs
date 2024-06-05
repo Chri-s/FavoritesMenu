@@ -24,7 +24,7 @@ public partial class App : Application
                 // Register UI
                 services.AddSingleton<IMainWindow, MainWindow>();
                 services.AddSingleton<AboutPage>();
-                services.AddSingleton<SearchPage>();
+                services.AddSingleton<ISearchPage, SearchPage>();
                 services.AddSingleton<SettingsPage>();
 
                 // Register View Models
